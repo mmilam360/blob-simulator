@@ -79,7 +79,16 @@ export default function Home() {
                 method: 'POST',
                 body: JSON.stringify({ amount: paymentAmount }),
             });
-            const data = await res.json();
+
+            // Robust Error Handling for JSON parsing
+            let data;
+            const resText = await res.text();
+            try {
+                data = JSON.parse(resText);
+            } catch (e) {
+                console.error("Failed to parse API response:", resText);
+                throw new Error("Server Error: " + resText.substring(0, 100) + "...");
+            }
 
             if (data.error) throw new Error(data.error + (data.details ? ` (${data.details})` : ''));
 

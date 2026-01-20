@@ -21,8 +21,18 @@ export class NWCHelper {
         if (!this.connection.secret) {
             throw new Error("Invalid NWC Connection string: missing secret");
         }
-        this.secretKey = Buffer.from(this.connection.secret, 'hex');
+        // Remove Buffer for Edge compatibility
+        this.secretKey = this.hexToBytes(this.connection.secret);
         this.pubKey = getPublicKey(this.secretKey);
+    }
+
+    private hexToBytes(hex: string): Uint8Array {
+        if (hex.length % 2 !== 0) throw new Error("Invalid hex string");
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < hex.length; i += 2) {
+            bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+        }
+        return bytes;
     }
 
     private parseConnectionString(uri: string): NWCConnection {
