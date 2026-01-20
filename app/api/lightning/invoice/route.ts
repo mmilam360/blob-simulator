@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SimpleNWC } from '@/lib/simple-nwc';
+import { LN } from "@getalby/sdk";
 
 export const runtime = 'edge';
 
@@ -22,16 +22,18 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const nwc = new SimpleNWC(connectionString);
-        const { invoice, paymentHash } = await nwc.createInvoice(Number(amount));
+        const ln = new LN(connectionString);
+        const request = await ln.receive({ satoshi: Number(amount) });
 
-        return NextResponse.json({ payment_request: invoice, payment_hash: paymentHash });
+        return NextResponse.json({
+            payment_request: request.invoice,
+            payment_hash: request.paymentHash
+        });
 
     } catch (error: any) {
-        console.error('Invoice Creation Error Full:', error);
-        const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+        console.error('Invoice Creation Error:', error);
         return NextResponse.json({
-            error: errorMessage || 'Failed to create invoice',
+            error: error.message || 'Failed to create invoice',
             details: error.toString()
         }, { status: 500 });
     }

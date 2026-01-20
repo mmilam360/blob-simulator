@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SimpleNWC } from '@/lib/simple-nwc';
+import { NWCClient } from "@getalby/sdk";
 
 export const runtime = 'edge';
 
@@ -23,13 +23,13 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
         }
 
-        const nwc = new SimpleNWC(connectionString);
-        const settled = await nwc.lookupInvoice(hash);
+        const client = new NWCClient({ nostrWalletConnectUrl: connectionString });
+        const result = await client.lookupInvoice({ payment_hash: hash });
 
-        return NextResponse.json({ settled });
+        return NextResponse.json({ settled: !!result?.settled_at });
 
     } catch (error: any) {
         console.error('Verify Error:', error);
-        return NextResponse.json({ error: error.message || 'Failed to verify' }, { status: 500 });
+        return NextResponse.json({ settled: false });
     }
 }
