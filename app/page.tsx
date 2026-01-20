@@ -5,7 +5,6 @@ import GameCanvas from '@/components/GameCanvas';
 import { Zap, Play, RotateCcw, PlusCircle, Trophy } from 'lucide-react';
 
 import { Button as BitcoinConnectButton } from "@getalby/bitcoin-connect-react";
-import { useBitcoinConnect } from "@getalby/bitcoin-connect-react";
 
 export default function Home() {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -25,9 +24,6 @@ export default function Home() {
     // Invoice State
     const [invoice, setInvoice] = useState<string>('');
     const [paymentHash, setPaymentHash] = useState<string>('');
-
-    // Bitcoin Connect
-    const { sendPayment } = useBitcoinConnect();
 
     const handleGameInit = (methods: any) => {
         setGameMethods(methods);
@@ -88,7 +84,10 @@ export default function Home() {
 
             // 1b. Attempt Auto-Pay with Bitcoin Connect
             try {
-                await sendPayment(data.payment_request);
+                if (window.webln) {
+                    await window.webln.enable();
+                    await window.webln.sendPayment(data.payment_request);
+                }
                 // If successful, the poller below will catch it instantly
             } catch (bcError) {
                 console.log("Bitcoin Connect auto-pay skipped or failed", bcError);
