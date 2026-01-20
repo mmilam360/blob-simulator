@@ -28,7 +28,11 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ payment_request: invoice, payment_hash: paymentHash });
 
     } catch (error: any) {
-        console.error('Invoice Creation Error:', error);
-        return NextResponse.json({ error: error.message || 'Failed to create invoice' }, { status: 500 });
+        console.error('Invoice Creation Error Full:', error);
+        const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+        return NextResponse.json({
+            error: errorMessage || 'Failed to create invoice',
+            details: error.toString()
+        }, { status: 500 });
     }
 }

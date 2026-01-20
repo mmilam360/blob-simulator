@@ -4,6 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import GameCanvas from '@/components/GameCanvas';
 import { Zap, Play, RotateCcw, PlusCircle, Trophy } from 'lucide-react';
 
+import { Button as BitcoinConnectButton } from "@getalby/bitcoin-connect-react";
+import { useBitcoinConnect } from "@getalby/bitcoin-connect-react";
+
 export default function Home() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [gameMethods, setGameMethods] = useState<any>(null);
@@ -23,12 +26,12 @@ export default function Home() {
     const [invoice, setInvoice] = useState<string>('');
     const [paymentHash, setPaymentHash] = useState<string>('');
 
+    // Bitcoin Connect
+    const { sendPayment } = useBitcoinConnect();
+
     const handleGameInit = (methods: any) => {
         setGameMethods(methods);
     };
-
-    // Poll for Winner (Game Loop Callback would be better, but polling context state is easier for MVP)
-    // Actually, we can pass a callback to GameCanvas
 
     const handleStart = () => {
         setIsPlaying(true);
@@ -54,7 +57,6 @@ export default function Home() {
                     method: 'POST',
                     body: JSON.stringify({ address: blob.payoutAddress, amount: winAmount })
                 });
-                // We could show a specific success message here
             } catch (e) {
                 console.error("Payout failed", e);
             }
@@ -79,10 +81,19 @@ export default function Home() {
             });
             const data = await res.json();
 
-            if (data.error) throw new Error(data.error);
+            if (data.error) throw new Error(data.error + (data.details ? ` (${data.details})` : ''));
 
             setInvoice(data.payment_request);
             setPaymentHash(data.payment_hash);
+
+            // 1b. Attempt Auto-Pay with Bitcoin Connect
+            try {
+                await sendPayment(data.payment_request);
+                // If successful, the poller below will catch it instantly
+            } catch (bcError) {
+                console.log("Bitcoin Connect auto-pay skipped or failed", bcError);
+                // Continue to manual flow
+            }
 
             // 2. Start Polling for Payment
             const pollInterval = setInterval(async () => {
@@ -110,10 +121,10 @@ export default function Home() {
             // Timeout after 2 mins
             setTimeout(() => clearInterval(pollInterval), 120000);
 
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
             setProcessing(false);
-            alert("Failed to generate invoice");
+            alert("Failed to generate invoice: " + err.message);
         }
     };
 
@@ -135,6 +146,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    <BitcoinConnectButton />
                     <div className="px-5 py-2 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-sm font-bold shadow-[0_0_15px_rgba(234,179,8,0.1)]">
                         POT: {pot.toLocaleString()} Sats
                     </div>
@@ -275,7 +287,7 @@ export default function Home() {
                                             {invoice}
                                         </div>
                                         <div className="text-center text-xs text-black font-medium">
-                                            Scan with Lightning Wallet
+                                            {processing ? 'Processing...' : 'Scan with Lightning Wallet'}
                                         </div>
                                     </div>
                                 )}
