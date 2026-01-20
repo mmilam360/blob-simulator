@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { NWCHelper } from '@/lib/nwc';
+import { SimpleNWC } from '@/lib/simple-nwc';
 
 export const runtime = 'edge';
 
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
         }
 
-        const nwc = new NWCHelper(connectionString);
+        const nwc = new SimpleNWC(connectionString);
         const settled = await nwc.lookupInvoice(hash);
 
         return NextResponse.json({ settled });

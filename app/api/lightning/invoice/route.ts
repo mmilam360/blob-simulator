@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { NWCHelper } from '@/lib/nwc';
+import { SimpleNWC } from '@/lib/simple-nwc';
 
 export const runtime = 'edge';
 
@@ -22,7 +21,7 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const nwc = new NWCHelper(connectionString);
+        const nwc = new SimpleNWC(connectionString);
         const { invoice, paymentHash } = await nwc.createInvoice(Number(amount));
 
         return NextResponse.json({ payment_request: invoice, payment_hash: paymentHash });

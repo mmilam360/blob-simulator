@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { NWCHelper } from '@/lib/nwc';
+import { SimpleNWC } from '@/lib/simple-nwc';
 
 export const runtime = 'edge';
 
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         const invoice = await resolveLightningAddress(address, amount);
 
         // 2. Pay via NWC
-        const nwc = new NWCHelper(connectionString);
+        const nwc = new SimpleNWC(connectionString);
         const preimage = await nwc.payInvoice(invoice);
 
         return NextResponse.json({ success: true, preimage });
