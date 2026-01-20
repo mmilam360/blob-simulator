@@ -1,3 +1,6 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 const BitcoinConnectButton = dynamic(
