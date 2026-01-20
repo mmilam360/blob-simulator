@@ -1,4 +1,4 @@
-import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { secp256k1, schnorr } from '@noble/curves/secp256k1.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
 import { cbc } from '@noble/ciphers/aes.js';
@@ -194,8 +194,9 @@ export class SimpleNWC {
     }
 
     private async signEvent(eventId: string): Promise<string> {
-        const sig = secp256k1.sign(hexToBytes(eventId), this.secretKey);
-        return bytesToHex(sig.toCompactRawBytes());
+        // Nostr uses Schnorr signatures, not ECDSA
+        const sig = schnorr.sign(hexToBytes(eventId), this.secretKey);
+        return bytesToHex(sig);
     }
 
     private async encryptState(text: string): Promise<{ content: string, iv: string }> {
