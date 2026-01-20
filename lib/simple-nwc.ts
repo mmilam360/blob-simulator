@@ -1,8 +1,8 @@
-import { secp256k1 } from '@noble/curves/secp256k1';
-import { sha256 } from '@noble/hashes/sha2';
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
-import { cbc, getIv } from '@noble/ciphers/aes';
-import { base64 } from '@noble/ciphers/webcrypto';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { sha256 } from '@noble/hashes/sha2.js';
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
+import { cbc } from '@noble/ciphers/aes.js';
+import { randomBytes } from '@noble/ciphers/webcrypto.js';
 
 // Simple Polyfill for base64 if needed, but standard btoa/atob work in Edge
 function encodeBase64(bytes: Uint8Array): string {
@@ -205,7 +205,7 @@ export class SimpleNWC {
         const sharedPoint = secp256k1.getSharedSecret(this.secretKey, remotePubBytes, true);
         const sharedX = sharedPoint.slice(1); // Drop 02/03 prefix
 
-        const iv = getIv(16);
+        const iv = randomBytes(16);
         const textBytes = new TextEncoder().encode(text);
         const cipher = cbc(sharedX, iv);
         const encrypted = cipher.encrypt(textBytes);
