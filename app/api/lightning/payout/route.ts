@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { NWCHelper } from '@/lib/nwc';
 
+export const runtime = 'edge';
+
 async function resolveLightningAddress(address: string, amountSats: number) {
     // 1. Get LNURL Parts
     const parts = address.split('@');

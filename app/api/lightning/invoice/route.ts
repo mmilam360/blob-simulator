@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { NWCHelper } from '@/lib/nwc';
 
-export const runtime = 'edge'; // Optional: Use edge if compatible, but 'nodejs' is safer for some libs. Nostr-tools works in edge usually. 
-// Actually Nostr-tools uses WebSocket. Edge runtime supports standard WebSocket.
-// Let's stick to default (Node) if unsure, but 'edge' is faster on Cloudflare.
-// Node runtime is better for compatibility if we run into "crypto" issues.
+export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
     try {
