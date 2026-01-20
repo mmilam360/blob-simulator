@@ -1,10 +1,9 @@
-'use client';
+import dynamic from 'next/dynamic';
 
-import React, { useState, useRef, useEffect } from 'react';
-import GameCanvas from '@/components/GameCanvas';
-import { Zap, Play, RotateCcw, PlusCircle, Trophy } from 'lucide-react';
-
-import { Button as BitcoinConnectButton } from "@getalby/bitcoin-connect-react";
+const BitcoinConnectButton = dynamic(
+    () => import("@getalby/bitcoin-connect-react").then((mod) => mod.Button),
+    { ssr: false }
+);
 
 export default function Home() {
     const [isPlaying, setIsPlaying] = useState(false);
