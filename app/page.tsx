@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import GameCanvas from '@/components/GameCanvas';
+import { Zap, Play, RotateCcw, PlusCircle, Trophy } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const BitcoinConnectButton = dynamic(
