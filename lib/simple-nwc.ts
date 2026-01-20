@@ -1,8 +1,8 @@
 import { secp256k1 } from '@noble/curves/secp256k1';
-import { sha256 } from '@noble/hashes/sha256';
+import { sha256 } from '@noble/hashes/sha2';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { cbc, getIv } from '@noble/ciphers/aes';
-import { base64 } from '@noble/ciphers/webcrypto/utils'; // Polyfill or use standard if available
+import { base64 } from '@noble/ciphers/webcrypto';
 
 // Simple Polyfill for base64 if needed, but standard btoa/atob work in Edge
 function encodeBase64(bytes: Uint8Array): string {
